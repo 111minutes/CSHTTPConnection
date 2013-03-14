@@ -84,8 +84,6 @@ static const CFOptionFlags kMyNetworkEvents =
     CFReadStreamSetClient(self.readStream, kMyNetworkEvents, &streamCallBack, &streamContext);
     
     CFReadStreamScheduleWithRunLoop(self.readStream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-    
-    NSLog(@"%@", CFRunLoopGetCurrent());
 }
 
 - (void)handleStreamStatus
@@ -217,7 +215,7 @@ CSHTTPResponse *responseFromReadStream(CFReadStreamRef readStream, CSHTTPConnect
         errorCode = self.statusCode;
         errorMessage = [NSString stringWithUTF8String:descriptionForResponseCode(errorCode)];
     } else if (aAction == TimeOutAction) {
-        errorCode = 666;
+        errorCode = 408;
         errorMessage = [NSString stringWithFormat:@"Stoped by TimeOut: TimeOutInterval = %.2f", self.timeOutInterval];
     }
     
@@ -306,6 +304,8 @@ BOOL handleNetworkEvent(CFStreamEventType aEventType, CSHTTPConnection *context)
         case kCFStreamEventErrorOccurred:
             [context generateErrorFromAction:StreamAction];
             break;
+            case kCFStreamEventEndEncountered:
+            [context.delegate connectionDidFinishLoading:context];
         default:
             break;
     }

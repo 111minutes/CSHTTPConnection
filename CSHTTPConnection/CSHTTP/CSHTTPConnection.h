@@ -20,6 +20,8 @@
 
 - (void)connection:(CSHTTPConnection *)aConnection didFailWithError:(NSError *)aError;
 
+- (void)connectionDidFinishLoading:(CSHTTPConnection *)connection;
+
 @end
 
 @interface CSHTTPConnection : NSObject

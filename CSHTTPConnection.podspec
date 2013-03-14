@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
 
   s.platform     = :ios, '5.0'
 
-  s.source_files = 'CSHTTPConnection', 'CSHTTP/**/*.{h,m}'
+  s.source_files = 'CSHTTPConnection/CSHTTP', 'CSHTTP/*.{h,m}'
 
   s.framework  = 'CFNetwork'
 
