@@ -41,5 +41,6 @@
 
 - (void)start;
 - (void)stop;
+- (void)cancel;
 
 @end
