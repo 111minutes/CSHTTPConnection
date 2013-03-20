@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name         = "CSHTTPConnection"
-  s.version      = "0.0.1"
+  s.version      = "0.0.2"
   s.summary      = "CSHTTPConnection."
   s.homepage     = "https://github.com/111minutes/CSHTTPConnection"
   s.license      = { :type => 'Custom', :text => 'Copyright (C) 2013 111minutes. All Rights Reserved.' }
   s.author       = { "TheSooth" => "thesooth@aol.com" }
-  s.source       = { :git => "https://github.com/111minutes/CSHTTPConnection.git", :tag => "0.0.1" }
+  s.source       = { :git => "https://github.com/111minutes/CSHTTPConnection.git", :tag => "0.0.2" }
 
   s.platform     = :ios, '5.0'
 
