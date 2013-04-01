@@ -25,7 +25,7 @@
 {
     
     self.statusCode = CFHTTPMessageGetResponseStatusCode(aMessage);
-    self.allHeadersFileds = (__bridge NSDictionary *)(CFHTTPMessageCopyAllHeaderFields(aMessage));
+    self.allHeadersFileds = (__bridge_transfer NSDictionary *)(CFHTTPMessageCopyAllHeaderFields(aMessage));
 }
 
 - (NSString *)description

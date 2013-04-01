@@ -11,7 +11,7 @@
 @interface CSHTTPResponse : NSObject
 
 @property (nonatomic, assign) NSInteger statusCode;
-@property (nonatomic, assign) NSDictionary *allHeadersFileds;
+@property (nonatomic, strong) NSDictionary *allHeadersFileds;
 
 - (id)initWithHTTPMessage:(CFHTTPMessageRef)aMessage;
 

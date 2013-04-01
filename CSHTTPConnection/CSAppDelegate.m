@@ -41,7 +41,7 @@
 {
     NSLog(@"DataLenght = %u", aData.length);
     
-    NSString *filePath = @"/tmp/dataFile";
+    NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"dataFile"];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
     if (![fileManager fileExistsAtPath:filePath]) {
@@ -53,6 +53,11 @@
     [fileHandle seekToEndOfFile];
     [fileHandle writeData:aData];
     [fileHandle closeFile];
+}
+
+- (void)connectionDidFinishLoading:(CSHTTPConnection *)connection
+{
+    
 }
 
 - (void)connection:(CSHTTPConnection *)aConnection didReceiveResponse:(CSHTTPResponse *)aResponse
