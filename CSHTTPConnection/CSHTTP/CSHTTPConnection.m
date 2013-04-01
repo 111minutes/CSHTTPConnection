@@ -40,6 +40,11 @@ static const CFOptionFlags kMyNetworkEvents =
 
 @implementation CSHTTPConnection
 
+- (void)dealloc
+{
+    CFRelease(_readStream);
+}
+
 - (id)init
 {
     self = [super init];
@@ -55,10 +60,12 @@ static const CFOptionFlags kMyNetworkEvents =
 - (void)setupRequest
 {
     CFURLRef URL = CFURLCreateWithString(kCFAllocatorDefault, (__bridge CFStringRef)(self.URLString), NULL);
-    self.messageRequest = CFHTTPMessageCreateRequest(kCFAllocatorDefault, (__bridge CFStringRef)(self.httpMethod), URL,
+    _messageRequest = CFHTTPMessageCreateRequest(kCFAllocatorDefault, (__bridge CFStringRef)(self.httpMethod), URL,
                                kCFHTTPVersion1_1);
     
     CFHTTPMessageSetBody(self.messageRequest, (__bridge CFDataRef)(self.body));
+    
+    CFRelease(URL);
     
     [self setupHTTPHeaders];
 }
@@ -75,9 +82,8 @@ static const CFOptionFlags kMyNetworkEvents =
 
 - (void)setupReadStream
 {
-    self.readStream = CFReadStreamCreateForHTTPRequest(kCFAllocatorDefault, self.messageRequest);
+    _readStream = CFReadStreamCreateForHTTPRequest(kCFAllocatorDefault, self.messageRequest);
     CFReadStreamOpen(self.readStream);
-    CFRelease(self.messageRequest);
     
     CFStreamClientContext streamContext = {0, (__bridge void *)(self), NULL, NULL, NULL};
     
@@ -190,6 +196,8 @@ CSHTTPResponse *responseFromReadStream(CFReadStreamRef readStream, CSHTTPConnect
     
     CSHTTPResponse *response = [[CSHTTPResponse alloc] initWithHTTPMessage:responseMessage];
     
+    CFRelease(responseMessage);
+    
     [context setStatusCode:response.statusCode];
     
     if (response.statusCode >= 400) {
@@ -201,8 +209,8 @@ CSHTTPResponse *responseFromReadStream(CFReadStreamRef readStream, CSHTTPConnect
 
 - (void)generateErrorFromAction:(NSInteger)aAction
 {
-    NSString *errorMessage;
-    NSInteger errorCode;
+    NSString *errorMessage = nil;
+    NSInteger errorCode = 0;
     CFErrorRef errorRef = NULL;
     NSError *error = nil;
     
@@ -210,7 +218,7 @@ CSHTTPResponse *responseFromReadStream(CFReadStreamRef readStream, CSHTTPConnect
         errorMessage = @"Connection canceled";
     } else if (aAction == StreamAction) {
         errorRef = CFReadStreamCopyError(self.readStream);
-        error = (__bridge NSError *)errorRef;
+        error = (__bridge_transfer NSError *)errorRef;
     } else if (aAction == NetworkAction) {
         errorCode = self.statusCode;
         errorMessage = [NSHTTPURLResponse localizedStringForStatusCode:errorCode];
@@ -220,8 +228,9 @@ CSHTTPResponse *responseFromReadStream(CFReadStreamRef readStream, CSHTTPConnect
     }
     
     if (!error) {
-       error = [NSError errorWithDomain:@"CSHTTPConnection" code:self.statusCode
-                                     userInfo:@{NSLocalizedDescriptionKey : errorMessage}];
+       error = [NSError errorWithDomain:@"CSHTTPConnection"
+                                   code:errorCode
+                               userInfo:@{NSLocalizedDescriptionKey : errorMessage}];
     }
     
     [self failWithError:error];
