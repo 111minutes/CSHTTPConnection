@@ -42,7 +42,9 @@ static const CFOptionFlags kMyNetworkEvents =
 
 - (void)dealloc
 {
-    CFRelease(_readStream);
+    if (_readStream) {
+        CFRelease(_readStream);
+    }
 }
 
 - (id)init
@@ -142,10 +144,12 @@ static const CFOptionFlags kMyNetworkEvents =
 {
     CFRunLoopStop(CFRunLoopGetCurrent());
     
-    CFReadStreamSetClient(self.readStream, 0, NULL, NULL);
-    CFReadStreamUnscheduleFromRunLoop(self.readStream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-    
-    CFReadStreamClose(self.readStream);
+    if (_readStream) {
+        CFReadStreamSetClient(self.readStream, 0, NULL, NULL);
+        CFReadStreamUnscheduleFromRunLoop(self.readStream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+        
+        CFReadStreamClose(self.readStream);
+    }
 }
 
 static void streamCallBack(CFReadStreamRef readStream, CFStreamEventType type, void *clientCallBackInfo)
