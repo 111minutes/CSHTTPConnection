@@ -157,14 +157,16 @@ static void streamCallBack(CFReadStreamRef readStream, CFStreamEventType type, v
     CSHTTPConnection *context = (__bridge CSHTTPConnection *)clientCallBackInfo;
     
     if (handleNetworkEvent(type, context)) {
-        CSHTTPResponse *response = responseFromReadStream(readStream, context);
-        
-        [context.delegate connection:context didReceiveResponse:response];
-        
-        
-        NSData *data = parseResponseDataFromStream(readStream, context);
-        
-        [context.delegate connection:context didReceiveData:data];
+        @autoreleasepool {
+            CSHTTPResponse *response = responseFromReadStream(readStream, context);
+            
+            [context.delegate connection:context didReceiveResponse:response];
+            
+            
+            NSData *data = parseResponseDataFromStream(readStream, context);
+            
+            [context.delegate connection:context didReceiveData:data];
+        }
     }
 }
 
